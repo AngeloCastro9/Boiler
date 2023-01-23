@@ -1,0 +1,17 @@
+generator client {
+    provider = "prisma-client-js"
+    output   = "../../node_modules/@writer/prisma/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL_WRITER")
+}
+
+model User {
+    id            String  @id @default(uuid())
+    email         String  @unique
+    password      String
+    resetPassCode String? @unique
+    name          String?
+}
