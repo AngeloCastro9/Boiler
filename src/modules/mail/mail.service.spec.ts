@@ -1,4 +1,3 @@
-// create a test file in src/modules/mail/mail.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { MailService } from './mail.service';
 import { MailerModule } from '@nestjs-modules/mailer';

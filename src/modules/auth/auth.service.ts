@@ -1,80 +1,95 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { User } from '@prisma/client';
 import { MailService } from '../mail/mail.service';
-import { randomBytes } from 'crypto';
-import { PrismaWriterService } from '../../connections/prisma/writer/prisma-writer.service';
+import { randomUUID } from 'crypto';
+import { PrismaService } from '../../connections/prisma/prisma.service';
+import { RedisService } from '../../connections/redis/redis.service';
+import { GenerateCodeService } from '../../shared/modules/generate-code/generate-code.service';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private mailService: MailService,
-    private prisma: PrismaWriterService,
+    private readonly mailService: MailService,
+    private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly redis: RedisService,
+    private readonly generateCodeService: GenerateCodeService,
+    private readonly userService: UserService,
   ) {}
 
-  async validateUser(email: string, password: string) {
+  async validateUser(email: string, password: string): Promise<string> {
     try {
-      const user = await this.prisma.user.findUniqueOrThrow({
-        where: { email },
-      });
+      const user = await this.userService.findOne(email);
 
       const compare = await bcrypt.compare(password, user.password);
 
       if (!compare) {
-        throw new HttpException('Incorrect email or passwords.', 400);
+        throw new BadRequestException('Incorrect email or password.');
       }
 
-      return this.login(user);
+      await this.generateCodeService.sendCodeToUser(user.email, user.name);
+
+      return 'Code sent to email.';
     } catch (error) {
-      throw new HttpException(error, 400);
+      throw new BadRequestException(error);
     }
   }
 
-  async sendRecoverPassword(email: string) {
-    try {
-      const user = await this.prisma.user.findUniqueOrThrow({
-        where: { email },
-      });
+  async sendRecoverPassword(email: string): Promise<string> {
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { email },
+    });
 
-      const token = randomBytes(32).toString('hex');
+    const token = randomUUID();
 
-      await this.prisma.user.update({
-        where: { email },
-        data: { resetPassCode: token },
-      });
+    await this.redis.set(token, user.id, 'EX', 120); // 2 minutes
 
-      await this.mailService.sendRecoverPassword(user.email, user.name, token);
+    await this.mailService.sendRecoverPassword(user.email, user.name, token);
 
-      return 'Recovery email sent.';
-    } catch (error) {
-      throw new HttpException(error, 400);
-    }
+    return 'Recovery email sent.';
   }
 
-  async resetPassword(token: string, password: string) {
-    try {
-      const user = await this.prisma.user.findUniqueOrThrow({
-        where: { resetPassCode: token },
-      });
+  async resetPassword(token: string, password: string): Promise<string> {
+    const userId = await this.redis.get(token);
 
-      await this.prisma.user.update({
-        where: {
-          resetPassCode: token,
-        },
-        data: {
-          password,
-          resetPassCode: '',
-        },
-      });
-
-      await this.mailService.sendRecoveredPassword(user.email, user.name);
-
-      return 'Password changed successfully.';
-    } catch (error) {
-      throw new HttpException(error, 400);
+    if (!userId) {
+      throw new BadRequestException('Invalid token.');
     }
+
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+    });
+
+    await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        password,
+      },
+    });
+
+    this.redis.del(token);
+    this.mailService.sendRecoveredPassword(user.email, user.name);
+
+    return 'Password changed successfully.';
+  }
+
+  async validateCode(code: string) {
+    const userMail = await this.redis.get(code);
+
+    if (!userMail) {
+      throw new BadRequestException('Invalid code.');
+    }
+
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { email: userMail },
+    });
+
+    return this.login(user);
   }
 
   async login(user: User) {

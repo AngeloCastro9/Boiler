@@ -1,24 +1,24 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
-import { PrismaReaderModule } from 'src/connections/prisma/reader/prisma-reader.module';
-import { PrismaWriterModule } from 'src/connections/prisma/writer/prisma-writer.module';
-import { RedisModule } from 'src/connections/redis/redis.module';
-import { WebSocketModule } from 'src/connections/websocket/websocket.module';
-import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
+import { RedisModule } from '../../connections/redis/redis.module';
+import { JwtAuthGuard } from '../../shared/guards/jwt-auth.guard';
 import { AuthModule } from '../auth/auth.module';
 import { MailModule } from '../mail/mail.module';
 import { AppService } from './app.service';
+import { PrismaModule } from '../../connections/prisma/prisma.module';
+import { UserModule } from '../user/user.module';
+import { GenerateCodeModule } from '../../shared/modules/generate-code/generate-code.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    PrismaReaderModule,
-    PrismaWriterModule,
+    PrismaModule,
     RedisModule,
-    WebSocketModule,
     AuthModule,
     MailModule,
+    UserModule,
+    GenerateCodeModule,
   ],
   providers: [
     AppService,

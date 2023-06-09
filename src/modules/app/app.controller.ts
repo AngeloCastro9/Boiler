@@ -1,13 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
-import { Public } from 'src/shared/guards/jwt-auth.guard';
 import { AppService } from './app.service';
+import { IsPublic } from '../../decorators/isPublic.decorator';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Public()
   @Get()
+  @IsPublic()
   healthCheck() {
     return this.appService.healthCheck();
   }

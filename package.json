@@ -1,8 +1,8 @@
 {
-  "name": "boiler",
+  "name": "mobili",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "Globalsys/Angelo C.",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -19,9 +19,6 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "generate": "prisma generate --schema prisma/writer/schema.prisma && prisma generate --schema prisma/reader/schema.prisma",
-    "reader": "prisma migrate dev prisma/reader/schema.prisma",
-    "writer": "prisma migrate dev prisma/writer/schema.prisma",
     "commit": "git-cz"
   },
   "lint-staged": {
@@ -39,7 +36,7 @@
     "@nestjs/passport": "^9.0.0",
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/platform-socket.io": "^9.2.1",
-    "@nestjs/websockets": "^9.2.1",
+    "@nestjs/swagger": "^6.3.0",
     "@prisma/client": "^4.9.0",
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.5.1",
@@ -50,7 +47,8 @@
     "prisma": "^4.9.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "swagger-ui-express": "^4.6.3"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",

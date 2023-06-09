@@ -58,4 +58,21 @@ export class MailService {
       return error;
     }
   }
+
+  async sendCode(email: string, name: string, code: string) {
+    try {
+      return this.mailerService.sendMail({
+        to: email,
+        subject: 'Opa, seu codigo chegou',
+        template: './sendCode',
+        context: {
+          name,
+          code,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
 }

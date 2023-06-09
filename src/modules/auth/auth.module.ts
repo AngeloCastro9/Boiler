@@ -4,20 +4,28 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { MailService } from '../mail/mail.service';
-import { jwtConstants } from './constants';
-import { PrismaWriterModule } from 'src/connections/prisma/writer/prisma-writer.module';
+import { PrismaModule } from '../../connections/prisma/prisma.module';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { RedisModule } from '../../connections/redis/redis.module';
+import { GenerateCodeModule } from '../../shared/modules/generate-code/generate-code.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
     PassportModule,
     MailerModule,
     JwtModule.register({
-      secret: jwtConstants.secret,
+      secret: process.env.AUTH_SECRET,
       signOptions: { expiresIn: '604800s' },
     }),
-    PrismaWriterModule,
+    PrismaModule,
+    RedisModule,
+    GenerateCodeModule,
+    UserModule,
   ],
-  providers: [JwtStrategy, MailService],
+  providers: [AuthService, JwtStrategy, MailService],
+  controllers: [AuthController],
   exports: [],
 })
 export class AuthModule {}
