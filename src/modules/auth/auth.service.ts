@@ -39,9 +39,7 @@ export class AuthService {
   }
 
   async sendRecoverPassword(email: string): Promise<string> {
-    const user = await this.prisma.user.findUniqueOrThrow({
-      where: { email },
-    });
+    const user = await this.userService.findOne(email);
 
     const token = randomUUID();
 
@@ -59,9 +57,7 @@ export class AuthService {
       throw new BadRequestException('Invalid token.');
     }
 
-    const user = await this.prisma.user.findUniqueOrThrow({
-      where: { id: userId },
-    });
+    const user = await this.userService.findOne(null, userId);
 
     await this.prisma.user.update({
       where: {
@@ -85,9 +81,7 @@ export class AuthService {
       throw new BadRequestException('Invalid code.');
     }
 
-    const user = await this.prisma.user.findUniqueOrThrow({
-      where: { email: userMail },
-    });
+    const user = await this.userService.findOne(userMail);
 
     return this.login(user);
   }
