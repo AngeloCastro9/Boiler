@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { User } from '@prisma/client';
-import { MailService } from '../mail/mail.service';
+import { MailService } from '../../shared/modules/mail/mail.service';
 import { randomUUID } from 'crypto';
 import { PrismaService } from '../../connections/prisma/prisma.service';
 import { RedisService } from '../../connections/redis/redis.service';

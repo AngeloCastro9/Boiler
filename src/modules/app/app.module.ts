@@ -4,7 +4,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { RedisModule } from '../../connections/redis/redis.module';
 import { JwtAuthGuard } from '../../shared/guards/jwt-auth.guard';
 import { AuthModule } from '../auth/auth.module';
-import { MailModule } from '../mail/mail.module';
+import { MailModule } from '../../shared/modules/mail/mail.module';
 import { AppService } from './app.service';
 import { PrismaModule } from '../../connections/prisma/prisma.module';
 import { UserModule } from '../user/user.module';

@@ -1,5 +1,5 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { MailService } from '../../../modules/mail/mail.service';
+import { MailService } from '../mail/mail.service';
 import { RedisService } from '../../../connections/redis/redis.service';
 
 @Injectable()

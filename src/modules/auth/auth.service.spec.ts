@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
-import { MailService } from '../mail/mail.service';
+import { MailService } from '../../shared/modules/mail/mail.service';
 import { PrismaService } from '../../connections/prisma/prisma.service';
 import { RedisService } from '../../connections/redis/redis.service';
 import { GenerateCodeService } from '../../shared/modules/generate-code/generate-code.service';

@@ -11,7 +11,7 @@ export class MailService {
 
       return this.mailerService.sendMail({
         to: email,
-        subject: 'Seja bem vindo ao LookBook!',
+        subject: 'Seja bem vindo ao Boiler!',
         template: './welcome',
         context: {
           name: name,
